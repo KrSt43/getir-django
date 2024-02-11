@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>table</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+
+      .container {
+        overflow-x: auto;
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .filter-container {
+        width: 95%;
+        max-width: 900px;
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+      }
+
+      button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding-inline: 15px;
+        padding-block: 5px;
+      }
+
+      button:hover {
+        background-color: #1177ff;
+      }
+
+      button:hover:active {
+        background-color: #2563eb;
+      }
+
+      .col {
+        display: flex;
+        flex-direction: column;
+      }
+
+      input {
+        border: 1px solid #d2d2d2;
+        padding: 0.25rem;
+        border-radius: 5px;
+      }
+
+      table {
+        width: 95%;
+        max-width: 900px;
+        border-collapse: collapse;
+        border: 2px solid rgb(140 140 140);
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+      }
+
+      thead {
+        background-color: rgb(228 240 245);
+      }
+
+      th,
+      td {
+        border: 1px solid rgb(160 160 160);
+        padding: 8px 10px;
+      }
+
+      td:last-of-type {
+        text-align: center;
+      }
+
+      tbody > tr:nth-of-type(even) {
+        background-color: rgb(237 238 242);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="filter-container">
+        <label>
+          Start date
+          <input type="date" id="start-date" />
+        </label>
+        <label>
+          End date
+          <input type="date" id="end-date" />
+        </label>
+        <label>
+          Minimum score
+          <input type="number" id="min-score" />
+        </label>
+        <label>
+          Maximum score
+          <input type="number" id="max-score" />
+        </label>
+      </div>
+      <div class="filter-container">
+        <label class="col">
+          Limit
+          <input type="number" id="limit" />
+        </label>
+        <label class="col">
+          Offset
+          <input type="number" id="offset" />
+        </label>
+        <button id="filter_button">Filtrele</button>
+      </div>
+      <table id="driver_table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Age</th>
+            <th scope="col">Driving Score</th>
+            <th scope="col">Created Date</th>
+            <th scope="col">Updated Date</th>
+          </tr>
+        </thead>
+        <tbody id="driver_table_body">
+        {% for driver in drivers %}
+          <tr>
+            <td>{{ driver.id }}</td>
+            <th scope="row">{{ driver.first_name }}</th>
+            <td>{{ driver.last_name }}</td>
+            <td>{{ driver.email }}</td>
+            <td>{{ driver.age }}</td>
+            <td>{{ driver.driving_score }}</td>
+            <td>{{ driver.created_at }}</td>
+            <td>{{ driver.updated_at }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('filter_button').addEventListener('click', function () {
+                var limit = document.getElementById('limit').value;
+                var start_date = document.getElementById('start-date').value;
+                var end_date = document.getElementById('end-date').value;
+                var max_score = document.getElementById('max-score').value;
+                var min_score = document.getElementById('min-score').value;
+                var offset = document.getElementById('offset').value;
+                var parametreler = [];
+                if (limit.trim() !== '') {
+                    parametreler.push('limit=' + limit);
+                }
+                if (max_score.trim() !== '') {
+                    parametreler.push('max_score=' + max_score);
+                }
+                if (start_date.trim() !== '') {
+                    parametreler.push('start_date=' + start_date);
+                }
+                if (min_score.trim() !== '') {
+                    parametreler.push('min_score=' + min_score);
+                }
+                if (end_date.trim() !== '') {
+                    parametreler.push('end_date=' + end_date);
+                }
+                if (offset.trim() !== '') {
+                    parametreler.push('offset=' + offset);
+                }
+                var queryString = parametreler.length > 0 ? '?' + parametreler.join('&') : '';
+                var url = 'http://localhost:8000/' + queryString;
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        updateTable(data.records);
+                    }
+                };
+                xhr.send();
+            });
+
+            function updateTable(data) {
+                var tbody = document.getElementById('driver_table_body');
+                tbody.innerHTML = '';
+                data.forEach(function (item) {
+                    var row = tbody.insertRow(-1);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    var cell6 = row.insertCell(5);
+                    var cell7 = row.insertCell(6);
+                    var cell8 = row.insertCell(7);
+                    cell1.textContent = item.id;
+                    cell2.textContent = item.first_name;
+                    cell3.textContent = item.last_name;
+                    cell4.textContent = item.email;
+                    cell5.textContent = item.age;
+                    cell6.textContent = item.driving_score;
+                    cell7.textContent = item.created_at;
+                    cell8.textContent = item.updated_at;
+                });
+            }
+        });
+    </script>
