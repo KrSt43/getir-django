@@ -174,7 +174,7 @@
                     parametreler.push('offset=' + offset);
                 }
                 var queryString = parametreler.length > 0 ? '?' + parametreler.join('&') : '';
-                var url = 'http://localhost:8000/' + queryString;
+                var url = 'https://fastapi-getir-39bf7a2f1f3a.herokuapp.com/drivers/' + queryString;
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
                 xhr.onload = function () {

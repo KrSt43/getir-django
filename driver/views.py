@@ -5,7 +5,7 @@ from django.views import View
 
 class DriverView(View):
     def get(self, request):
-        response = requests.get('http://localhost:8000/')
+        response = requests.get('https://fastapi-getir-39bf7a2f1f3a.herokuapp.com/drivers/')
         if response.status_code == 200:
             data = response.json()
             drivers = data["records"]
